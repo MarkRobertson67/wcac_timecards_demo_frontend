@@ -2,6 +2,8 @@
 // Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
+## Version 1.0.5-DEMO (2025-04-20)
+- DEMO Version
 
 ## Version 1.0.5 (2025-04-20)
 - Formatting Reports to be mobile responsive
