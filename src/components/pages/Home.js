@@ -2,7 +2,6 @@
 // Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
-
 import React, { useState, useEffect } from "react";
 import {
   createUserWithEmailAndPassword,
@@ -17,8 +16,8 @@ import ProfileModal from "./ProfileModal/ProfileModal";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import styles from "./Home.module.css"
-import bus from '../../Assets/Bus.png'
+import styles from "./Home.module.css";
+import bus from "../../Assets/Bus.png";
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -35,7 +34,9 @@ function Home() {
   const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isWaitingForEmailVerification, setIsWaitingForEmailVerification] = useState(false);
+  const [isWaitingForEmailVerification, setIsWaitingForEmailVerification] =
+    useState(false);
+  const [isSignupSelected, setIsSignupSelected] = useState(false);
 
   const navigate = useNavigate();
 
@@ -43,10 +44,12 @@ function Home() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user);
-  
+
         if (user.emailVerified) {
           try {
-            const response = await fetch(`${API}/employees/firebase/${user.uid}`);
+            const response = await fetch(
+              `${API}/employees/firebase/${user.uid}`
+            );
             if (response.ok) {
               const { data } = await response.json();
               setFirstName(data.first_name);
@@ -60,7 +63,9 @@ function Home() {
             }
           } catch (err) {
             console.error("Error fetching user profile:", err.message);
-            alert("An error occurred while fetching your profile. Please log in again.");
+            alert(
+              "An error occurred while fetching your profile. Please log in again."
+            );
             await signOut(auth);
             setCurrentUser(null);
             navigate("/"); // Redirect to login page
@@ -77,10 +82,9 @@ function Home() {
       }
       setIsLoadingAuth(false);
     });
-  
+
     return () => unsubscribe();
   }, [navigate]);
-  
 
   useEffect(() => {
     if (currentUser && !currentUser.emailVerified) {
@@ -112,7 +116,6 @@ function Home() {
     }
   }, [currentUser]);
 
-
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       if (!isProfileComplete) {
@@ -126,7 +129,6 @@ function Home() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [isProfileComplete]);
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -187,7 +189,7 @@ function Home() {
 
   const handleModalClose = () => {
     setShowModal(false);
-    navigate("/createNewTimeCard"); 
+    navigate("/createNewTimeCard");
   };
 
   const handleResendVerification = async () => {
@@ -225,24 +227,26 @@ function Home() {
     );
   }
 
-
   return (
     <div className={styles.hPage}>
       <div className="container mt-5">
         {isWaitingForEmailVerification && (
           <div className="text-center">
             <div className="spinner-border text-primary" role="status"></div>
-            <p className="mt-3">
-              Waiting for email verification.
+            <p className="mt-3">Waiting for email verification.</p>
+            <p className="mt-2">
+              An email has been sent to your inbox with a verification link.
+              Please open the email and click on the verification link to
+              confirm your account.
             </p>
             <p className="mt-2">
-              An email has been sent to your inbox with a verification link. Please open the email and click on the verification link to confirm your account.
-            </p>
-            <p className="mt-2">
-              Once you verify your email, this page will automatically update, and you can proceed to complete your profile.
+              Once you verify your email, this page will automatically update,
+              and you can proceed to complete your profile.
             </p>
             <p className="mt-2 text-muted">
-              If you didn't receive the email, please check your spam or junk folder. You can also click the button below to resend the verification email.
+              If you didn't receive the email, please check your spam or junk
+              folder. You can also click the button below to resend the
+              verification email.
             </p>
             <button className="btn btn-link" onClick={handleResendVerification}>
               Didn't get an email? Resend Verification Email
@@ -252,7 +256,7 @@ function Home() {
             )}
           </div>
         )}
-  
+
         {currentUser && !isWaitingForEmailVerification && (
           <div className="text-center">
             <h1>Hello {firstName || "User"}! You are currently logged in</h1>
@@ -266,10 +270,12 @@ function Home() {
             )}
           </div>
         )}
-  
+
         {!currentUser && !isWaitingForEmailVerification && (
           <>
-            <h1 className="text-center mb-4">Please Login to access your account</h1>
+            <h1 className="text-center mb-4">
+              Please Login to access your account
+            </h1>
             <form
               onSubmit={handleSubmit}
               className="card p-3 mx-auto"
@@ -324,22 +330,37 @@ function Home() {
             <div className="text-center mt-3">
               <button
                 className="btn btn-secondary"
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setIsSignupSelected(!isSignupSelected);
+                }}
               >
                 {isLogin ? "Switch to Sign Up" : "Switch to Login"}
               </button>
             </div>
+
+            {/* Flashing Text Link */}
+            <div className="text-center mt-3">
+              <p className={`${isSignupSelected ? styles.flashingText : ""}`}>
+                Before you create an account, please review the{" "}
+                <a href="/tutorials">tutorials</a>.
+              </p>
+            </div>
           </>
         )}
-  
+
         {/* Bus Image at the bottom */}
         <div style={{ position: "relative", zIndex: 10 }}>
-        <img src={bus} alt="Bus" className={styles.busAnimation} style={{ width: "200px" }}/>
-      </div>
+          <img
+            src={bus}
+            alt="Bus"
+            className={styles.busAnimation}
+            style={{ width: "200px" }}
+          />
+        </div>
       </div>
     </div>
   );
-  
 }
 
 export default Home;
