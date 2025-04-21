@@ -1,0 +1,141 @@
+/* Proprietary Software License
+   Copyright (c) 2024 Mark Robertson
+   See LICENSE.txt file for details. */
+
+   
+/* EmployeeDetails.module.css */
+
+/* Main Page Style */
+.edPage {
+  background: linear-gradient(135deg, #d3d8dd, #3c4650); /* Gradient background */
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Ensure it takes full height */
+  overflow: hidden; /* Prevent scrolling on desktop */
+}
+
+/* Container Styles */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  flex-grow: 1;
+  overflow-y: auto; /* Allow scrolling in the container */
+  max-height: calc(100vh - 60px); /* Ensure content fits in mobile screens */
+  position: relative; /* Allow scroll within the container */
+}
+
+/* Title */
+h2 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Button Container */
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.button-container .btn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  transition: background-color 0.3s;
+}
+
+/* Save and Cancel Buttons */
+.btn-primary {
+  background-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #565e64;
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+  /* Ensure the content container scrolls */
+  .container {
+    padding: 1rem;
+    overflow-y: auto; /* Allow scrolling on mobile */
+    max-height: calc(100vh - 100px); /* Ensure content takes up available space */
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  .form-group input,
+  .form-group select {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  .button-container {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .button-container .btn {
+    width: 100%;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  /* Adjust the footer area for mobile */
+  .edPage {
+    display: flex;
+    flex-direction: column;
+    height: auto; /* Allow height to adjust with content */
+    overflow: visible;
+  }
+
+  /* Make sure the card body is scrollable if content exceeds */
+  .card-body {
+    height: 100%; /* Allow it to fill the remaining height */
+    overflow-y: auto; /* Allow vertical scrolling */
+  }
+}

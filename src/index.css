@@ -1,0 +1,26 @@
+/* Proprietary Software License
+   Copyright (c) 2025 Mark Robertson
+   See LICENSE.txt file for details. */
+
+   #root {
+    padding-top: 33px;   /* height of your navbar */
+    padding-bottom: 20px;/* height of your footer */
+    box-sizing: border-box;
+    height: 100%;        /* Allow the root container to take full height */
+    overflow-y: auto;    
+  }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-y: auto;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

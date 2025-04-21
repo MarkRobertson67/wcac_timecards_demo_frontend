@@ -1,0 +1,104 @@
+/* Proprietary Software License
+Copyright (c) 2025 Mark Robertson
+See LICENSE.txt file for details. */
+
+/* FAQ.module.css */
+
+/* Set background gradient for the whole page */
+/*background: linear-gradient(135deg, #4a90e2, #ffcc00);  Gradient from blue to yellow */
+
+
+/* Global styles */
+.faqPage {
+  overflow: auto;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #d3d8dd, #3c4650);
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  padding-bottom: 120px; /* Space for the footer */
+  box-sizing: border-box;
+}
+
+/* FAQ Container */
+.faqContainer {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #ffffff; /* White background for the FAQ container */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.faqTitle {
+  font-weight: bold;
+  text-align: center;
+  font-size: 2rem;
+  color: #4a90e2;
+  margin-bottom: 20px;
+}
+
+.faqList {
+  padding: 0;
+  margin: 0;
+}
+
+.faqItem {
+  margin-bottom: 1rem; /* Reduce space between items */
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 0.25rem; /* Reduce the padding to make the boxes smaller */
+}
+
+.faqQuestion {
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.5rem; /* Adjust padding to control the box height */
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border-radius: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.faqQuestion:hover {
+  background-color: #357ab7; /* Darker blue on hover */
+}
+
+.faqQuestion.active {
+  background-color: #357ab7; /* Active state color */
+}
+
+.faqToggleIcon {
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding-left: 10px;
+}
+
+.faqAnswer {
+  padding: 10px 15px;
+  background-color: #e1f0ff; /* Light blue background for answers */
+  border-radius: 5px;
+  margin-top: 5px;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .faqTitle {
+    font-size: 1.5rem;
+  }
+
+  .faqQuestion {
+    font-size: 1rem;
+    padding: 12px;
+  }
+
+  .faqAnswer {
+    font-size: 0.9rem;
+  }
+}

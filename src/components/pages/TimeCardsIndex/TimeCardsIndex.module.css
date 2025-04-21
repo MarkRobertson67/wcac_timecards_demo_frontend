@@ -1,0 +1,128 @@
+/* Proprietary Software License
+Copyright (c) 2025 Mark Robertson
+See LICENSE.txt file for details. */
+
+
+/* Basic reset */
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Prevent scrolling on desktop */
+@media (min-width: 769px) {
+  html, body {
+    overflow: hidden;
+  }
+}
+
+/* Container styling */
+.container {
+  margin-top: 40px; /* Ensure space below navbar */
+  min-height: calc(100vh - 120px); /* Account for footer and spacing */
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 150px;
+  overflow-y: auto;
+}
+
+/* Centering title */
+.container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+}
+
+/* FullCalendar styling */
+.fc {
+  height: auto;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+/* Adjusting the height of the calendar cells */
+.fc-daygrid-day-frame {
+  height: 70px;
+}
+
+/* Adjusting the height of the calendar header */
+.fc-header-toolbar {
+  height: 40px;
+}
+
+/* Styling for header buttons */
+.fc-button {
+  background-color: transparent;
+  border: none;
+  color: #000;
+  font-weight: normal;
+  outline: none;
+}
+
+/* Styling for button in different states */
+.fc-button:hover {
+  background-color: #f0f0f0;
+  color: #000;
+  font-weight: bold;
+}
+
+.fc-button:active, .fc-button:focus {
+  background-color: transparent;
+  color: #000;
+  border: none;
+  outline: none;
+}
+
+.fc-button:focus-visible {
+  outline: none;
+}
+
+/* Component-Specific Styles */
+.eventContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+}
+
+.eventContent span {
+  font-size: 1rem;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .eventContent span {
+    font-size: 0.5rem;
+  }
+
+  .fc-daygrid-day-frame {
+    height: 50px;
+  }
+
+  .fc .fc-daygrid-event {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .eventContent span {
+    font-size: 0.5rem;
+    line-height: 1;
+  }
+
+  .container {
+    padding: 10px;
+    padding-top: 20px;
+    padding-bottom: 355px;
+  }
+}
+

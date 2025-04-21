@@ -1,0 +1,241 @@
+/* Proprietary Software License
+Copyright (c) 2025 Mark Robertson
+See LICENSE.txt file for details. */
+
+/* ==== Base container: fixed height ==== */
+.reportpageContainer {
+  max-width: 1200px;
+  height: calc(100vh - 200px);  /* Locks height across all devices */
+  margin: 0 auto;
+  padding: 20px;
+  padding-bottom: 50px;
+  background-color: white;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  /* overflow: hidden; */
+}
+
+/* anchor for “Back to Top” */
+#reportTop {
+  display: block;
+  height: 0;
+  visibility: hidden;
+  /* leave 50px gap under your fixed navbar */
+  scroll-margin-top: 50px;
+}
+
+
+/* ==== Table wrapper: handles all scrolling ==== */
+.reportTableContainer {
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+/* ==== Table formatting ==== */
+.table {
+  width: 100%;
+  min-width: 1000px;
+  margin: 0 auto;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 10px;
+}
+
+.table th {
+  background-color: #f8f9fa;
+}
+
+.table-striped tbody tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+/* ==== Header ==== */
+.reportpageContainer h2 {
+  margin-top: 0;
+}
+
+/* ==== Mobile: fix height + table scrolls ==== */
+@media (max-width: 768px) {
+  .reportpageContainer {
+    height: calc(100vh - 150px);
+    padding: 10px;
+  }
+
+  .reportTableContainer {
+    padding-bottom: 40px;
+  }
+
+  .table {
+    table-layout: auto;
+    font-size: 0.75rem;
+  }
+
+  .table th,
+  .table td {
+    font-size: 0.65rem;
+    padding: 5px;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  /* FIX: Keep ID column from wrapping */
+  .table th:nth-child(1),
+  .table td:nth-child(1) {
+    min-width: 50px;
+    white-space: nowrap;
+  }
+
+  /* FIX: Prevent name from wrapping weirdly */
+  .table th:nth-child(2),
+  .table td:nth-child(2) {
+    min-width: 130px;
+    white-space: nowrap;
+  }
+
+  .button-group {
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .button-group button {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+}
+
+/* ==== Extra small screen tweak ==== */
+@media (max-width: 375px) {
+  
+  .reportTableContainer {
+    padding: 0 10px 60px 10px;
+    overflow-x: auto !important;
+  }
+
+  .reportTableContainer table th {
+    white-space: nowrap !important;        /* don’t wrap at all */
+    word-break: normal !important;        /* only break at spaces */
+    overflow-wrap: normal !important;     /* only wrap at normal break points */
+  }
+
+  .table {
+    table-layout: auto !important;
+    min-width: unset !important;
+    width: max-content;
+  }
+  
+  .table th,
+  .table td {
+    font-size: 0.6rem;
+    padding: 4px;
+  }
+
+  .table td:first-child {
+    white-space: nowrap;
+    min-width: 150px;
+  }
+
+  .table td:nth-child(2) {
+    white-space: nowrap;
+    min-width: 0px;
+  }
+
+  .table td:first-child(3) {
+    white-space: nowrap;
+    min-width: 50px;
+  }
+
+  .table td:nth-child(4) {
+    white-space: nowrap;
+    min-width: 50px;
+  }
+
+  .break-cell {
+    white-space: normal;
+    word-break: break-word;
+    text-align: center;
+  }
+
+  .backToTopButton {
+    margin-bottom: 60px;
+  }
+  
+}
+
+
+/* ==== Print ==== */
+@media print {
+
+
+  /* 1) Prevent any container from clipping later pages */
+  html,
+  body,
+  .reportpageContainer,
+  .reportTableContainer {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  /*Each block starts on a fresh page with built‑in top padding */
+  .reportTableContainer {
+    page-break-before: always !important;
+    padding-top: 1in;
+    padding-bottom: 1in;
+    margin-bottom: 25px;
+    box-sizing: border-box;
+  }
+  
+  /* No extra blank after the last block */
+  .reportTableContainer:last-of-type {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  /* Repeat the entire THEAD on each page (so Name + Column Heads show) */
+  .reportTableContainer thead {
+    display: table-header-group !important;
+  }
+
+  /*Allow tables to split across pages, but never break a row in half */
+  .reportTableContainer table {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+  .reportTableContainer tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Standard 1″ page margins */
+  @page {
+    margin: .25in;
+  }
+
+  /*Firefox only: disable flex so page-breaks work */
+  @-moz-document url-prefix() {
+    /* turn off flex so breaks can happen */
+    .reportpageContainer {
+      display: block !important;
+    }
+
+    .reportTableContainer {
+      display: block !important;
+
+      /* DROP the 'after' break, keep only 'before' */
+      page-break-after: auto !important;
+      page-break-before: always !important;
+    }
+    /* no extra break before first block */
+    .reportTableContainer:first-of-type {
+      page-break-before: auto !important;
+    }
+  }
+}

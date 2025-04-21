@@ -1,0 +1,63 @@
+/* Proprietary Software License
+Copyright (c) 2025 Mark Robertson
+See LICENSE.txt file for details. */
+
+/* Home.module.css */
+
+.hPage {
+    overflow: auto;
+    min-height: 90vh;
+    background: linear-gradient(135deg, #d3d8dd, #3c4650);
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    padding-bottom: 120px;
+    box-sizing: border-box;
+  }
+  
+.hPage .container {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #ffffff; /* Optional: adding white background to the form area */
+    border-radius: 8px; /* Optional: rounding the corners of the form area */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: adding shadow for better visibility */
+  }
+  
+  /* Button styles (adjust to your needs) */
+  .btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+
+  /* Ensure the homepage container has relative positioning */
+.homepage {
+  position: relative;
+  /* Other styling */
+}
+  
+/* Container for the bus - position it absolutely */
+
+  
+/* The bus image itself */
+.busAnimation {
+  position: absolute;
+  margin-top: 80px;
+  width: 150px; /* Adjust size as needed */
+  animation: driveAcross 10s linear infinite;
+}
+  
+/* Keyframes for the bus moving from left to right */
+@keyframes driveAcross {
+  from {
+    left: -160px; /* Start off-screen on the left */
+  }
+  to {
+    left: 100%; /* Move off-screen on the right */
+  }
+}
+
+@media (max-width: 768px) {
+  .busAnimation {
+    margin-top: 10px; /* Mobile */
+  }
+}
