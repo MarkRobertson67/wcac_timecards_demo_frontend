@@ -47,9 +47,12 @@ function Home() {
     // helper to fetch profile and update state
     const fetchProfile = async (uid) => {
       try {
+        console.log("→ fetching profile for", uid);
         const res = await fetch(`${API}/employees/firebase/${uid}`);
         if (res.ok) {
+          console.log("← profile status", res.status);
           const { data } = await res.json();
+          console.log("← profile raw response", data);
           setFirstName(data.first_name);
           setIsProfileComplete(!!data.first_name);
           setShowModal(!data.first_name);
@@ -111,7 +114,7 @@ function Home() {
     };
   }, [navigate]);
   
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
