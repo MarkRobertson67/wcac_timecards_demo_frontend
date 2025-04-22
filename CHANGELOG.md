@@ -2,6 +2,10 @@
 // Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
+
+## Version 1.0.6-DEMO (2025-04-22)
+- Updated 3 Home UseEffect's into 1
+
 ## Version 1.0.5-DEMO (2025-04-20)
 - DEMO Version
 
