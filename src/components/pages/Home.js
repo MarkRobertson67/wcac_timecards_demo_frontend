@@ -41,94 +41,77 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    let unsubscribe;
+    let verificationInterval;
+  
+    // helper to fetch profile and update state
+    const fetchProfile = async (uid) => {
+      try {
+        const res = await fetch(`${API}/employees/firebase/${uid}`);
+        if (res.ok) {
+          const { data } = await res.json();
+          setFirstName(data.first_name);
+          setIsProfileComplete(!!data.first_name);
+          setShowModal(!data.first_name);
+        } else if (res.status === 404) {
+          // no profile yet
+          setShowModal(true);
+        } else {
+          console.error('Unexpected profile fetch status:', res.status);
+          alert('Unexpected error. Please log in again.');
+          await signOut(auth);
+          navigate('/');
+        }
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+        alert('Error fetching profile. Please log in again.');
+        await signOut(auth);
+        navigate('/');
+      }
+    };
+  
+    unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setIsLoadingAuth(true);
+      clearInterval(verificationInterval);
+  
       if (user) {
         setCurrentUser(user);
-
+  
         if (user.emailVerified) {
-          try {
-            const response = await fetch(
-              `${API}/employees/firebase/${user.uid}`
-            );
-            if (response.ok) {
-              const { data } = await response.json();
-              setFirstName(data.first_name);
-              setIsProfileComplete(!!data.first_name);
-              setShowModal(!data.first_name); // Show modal if no profile exists
-            } else if (response.status === 404) {
-              console.log("No employee found, logging out.");
-              throw new Error("Profile not found");
-            } else {
-              throw new Error("Unexpected error fetching profile.");
-            }
-          } catch (err) {
-            console.error("Error fetching user profile:", err.message);
-            alert(
-              "An error occurred while fetching your profile. Please log in again."
-            );
-            await signOut(auth);
-            setCurrentUser(null);
-            navigate("/"); // Redirect to login page
-            return; // Exit early if an error occurs
-          }
+          // user already verified
+          setIsWaitingForEmailVerification(false);
+          await fetchProfile(user.uid);
         } else {
+          // start polling until they verify
           setIsWaitingForEmailVerification(true);
+          verificationInterval = setInterval(async () => {
+            await user.reload();
+            if (user.emailVerified) {
+              clearInterval(verificationInterval);
+              setIsWaitingForEmailVerification(false);
+              await fetchProfile(user.uid);
+            }
+          }, 2000);
         }
       } else {
+        // no user: reset everything
         setCurrentUser(null);
-        setFirstName("");
+        setFirstName('');
         setIsProfileComplete(false);
         setShowModal(false);
+        setIsWaitingForEmailVerification(false);
       }
+  
       setIsLoadingAuth(false);
     });
-
-    return () => unsubscribe();
-  }, [navigate]);
-
-  useEffect(() => {
-    if (currentUser && !currentUser.emailVerified) {
-      const interval = setInterval(async () => {
-        await currentUser.reload(); // Reload the user's info
-        if (currentUser.emailVerified) {
-          clearInterval(interval);
-          setIsWaitingForEmailVerification(false);
-          try {
-            const response = await fetch(
-              `${API}/employees/firebase/${currentUser.uid}`
-            );
-            if (response.ok) {
-              const { data } = await response.json();
-              setFirstName(data.first_name);
-              setIsProfileComplete(!!data.first_name);
-              setShowModal(!data.first_name); // Show modal if no profile exists
-            } else {
-              setShowModal(true); // Show modal if profile is missing
-            }
-          } catch (err) {
-            console.error("Error fetching user profile:", err.message);
-            setShowModal(true);
-          }
-        }
-      }, 2000); // Check every 2 seconds
-
-      return () => clearInterval(interval); // Cleanup on unmount
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (!isProfileComplete) {
-        e.preventDefault();
-        e.returnValue = "You cannot navigate away until your profile is saved.";
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
+  
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+      unsubscribe && unsubscribe();
+      clearInterval(verificationInterval);
     };
-  }, [isProfileComplete]);
+  }, [navigate]);
+  
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
