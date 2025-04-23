@@ -2,7 +2,7 @@
 // Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -40,52 +40,52 @@ function Home() {
 
   const navigate = useNavigate();
 
-
-  
-
-  useEffect(() => {
-    let unsubscribe;
-    let verificationInterval;
-  
-    // helper to fetch profile and update state
-    const fetchProfile = async (uid) => {
+  // helper to fetch profile and update state
+  const fetchProfile = useCallback(
+    async (uid) => {
       try {
         console.log("→ fetching profile for", uid);
         const res = await fetch(`${API}/employees/firebase/${uid}`);
         if (res.ok) {
-          console.log("← profile status", res.status);
           const { data } = await res.json();
-          console.log("← profile raw response", data);
           setFirstName(data.first_name);
           setIsProfileComplete(!!data.first_name);
           setShowModal(!data.first_name);
         } else if (res.status === 404) {
-          // no profile yet
           setShowModal(true);
         } else {
-          console.error('Unexpected profile fetch status:', res.status);
-          alert('Unexpected error. Please log in again.');
+          alert("Unexpected error. Please log in again.");
           await signOut(auth);
-          navigate('/');
+          navigate("/");
         }
       } catch (err) {
-        console.error('Error fetching profile:', err);
-        alert('Error fetching profile. Please log in again.');
+        console.error(err);
+        alert("Error fetching profile. Please log in again.");
         await signOut(auth);
-        navigate('/');
+        navigate("/");
       }
-    };
-  
+    },
+    // only re-create if API or navigate change
+    [navigate]
+  );
+
+  useEffect(() => {
+    let unsubscribe;
+    let verificationInterval;
+
     unsubscribe = onAuthStateChanged(auth, async (user) => {
       setIsLoadingAuth(true);
       clearInterval(verificationInterval);
-  
+
       if (user) {
         setCurrentUser(user);
-  
+
         if (user.emailVerified) {
           // user already verified
+          // switch the form back to Login view
           setIsWaitingForEmailVerification(false);
+          setIsLogin(true);
+          setIsSignupSelected(false);
           await fetchProfile(user.uid);
         } else {
           // start polling until they verify
@@ -93,6 +93,8 @@ function Home() {
           verificationInterval = setInterval(async () => {
             await user.reload();
             if (user.emailVerified) {
+              // once they verify, switch to Login view
+              setIsLogin(true);
               clearInterval(verificationInterval);
               setIsWaitingForEmailVerification(false);
               await fetchProfile(user.uid);
@@ -102,22 +104,22 @@ function Home() {
       } else {
         // no user: reset everything
         setCurrentUser(null);
-        setFirstName('');
+        setFirstName("");
         setIsProfileComplete(false);
         setShowModal(false);
         setIsWaitingForEmailVerification(false);
       }
-  
+
       setIsLoadingAuth(false);
     });
-  
+
     return () => {
       unsubscribe && unsubscribe();
       clearInterval(verificationInterval);
     };
-  }, [navigate]);
-  
+  }, [navigate, fetchProfile]);
 
+  // In Home.js, replace your handleSubmit with this:
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -126,32 +128,68 @@ function Home() {
 
     try {
       if (isLogin) {
-        // Login user
-        const userCredential = await signInWithEmailAndPassword(
+        // ── 1) Sign them in ──
+        const { user } = await signInWithEmailAndPassword(
           auth,
           email,
           password
         );
-        console.log("Logged in:", userCredential.user);
-        setEmail("");
-        setPassword("");
+        console.log("Logged in:", user);
 
-        //const activeTimecard = localStorage.getItem("startDate");
+        // ── 2) Email must be verified ──
+        if (!user.emailVerified) {
+          alert("Please verify your email before logging in.");
+          await signOut(auth);
+          return;
+        }
+
+        // ── 3) Check for an existing profile record ──
+        const res = await fetch(`${API}/employees/firebase/${user.uid}`);
+        if (res.status === 404) {
+          // No record → show the profile modal
+          setCurrentUser(user);
+          setShowModal(true);
+          return;
+        }
+
+        // ── 4) We got a record, parse it ──
+        const { data } = await res.json();
+        if (!data.first_name) {
+          // Record exists but missing first_name → show the modal
+          setCurrentUser(user);
+          setShowModal(true);
+          return;
+        }
+
+        // ── 5) All good: load state & navigate ──
+        setCurrentUser(user);
+        setFirstName(data.first_name);
+        setIsProfileComplete(true);
         navigate("/createNewTimeCard");
       } else {
-        // Sign up user
-        const userCredential = await createUserWithEmailAndPassword(
+        // ── Sign-up flow remains mostly the same ──
+        const { user } = await createUserWithEmailAndPassword(
           auth,
           email,
           password
         );
-        console.log("User created:", userCredential.user);
+        console.log("User created:", user);
 
-        await sendEmailVerification(userCredential.user);
+        // Send verification e-mail and sign them back out
+        await sendEmailVerification(user);
         alert(
-          "Thank you for signing up! A verification email has been sent to your inbox. Please verify your email before continuing."
+          "Thank you for signing up! A verification email has been sent. " +
+            "Once you verify, come back here to log in."
         );
 
+        // Go into “waiting” mode and switch the form to LOGIN
+        setIsLogin(true);
+        setIsSignupSelected(false);
+        setIsWaitingForEmailVerification(true);
+
+        // await signOut(auth);
+
+        // Reset form
         setEmail("");
         setPassword("");
       }
@@ -176,10 +214,13 @@ function Home() {
     }
   };
 
-  const handleModalClose = () => {
-    setShowModal(false);
-    // navigate("/createNewTimeCard");
-  };
+  // const handleModalClose = async () => {
+  //   setShowModal(false);
+  //   if (currentUser) {
+  //     await fetchProfile(currentUser.uid);
+  //   }
+  //   // navigate("/createNewTimeCard");
+  // };
 
   const handleResendVerification = async () => {
     if (currentUser) {
@@ -216,9 +257,28 @@ function Home() {
     );
   }
 
+  // This runs when the profile is successfully saved:
+  const handleProfileSaved = async () => {
+    setShowModal(false);
+    // re-fetch so firstName/isProfileComplete update
+    if (currentUser) await fetchProfile(currentUser.uid);
+  };
+
+  // This runs when the user clicks “Cancel” in the modal:
+  const handleProfileCanceled = async () => {
+    // drop them back to login
+    await signOut(auth);
+    setShowModal(false);
+    setCurrentUser(null);
+    setIsProfileComplete(false);
+    setIsLogin(true);
+    setIsSignupSelected(false);
+  };
+
   return (
     <div className={styles.hPage}>
       <div className="container mt-5">
+        {/* 1) Waiting for e-mail verification */}
         {isWaitingForEmailVerification && (
           <div className="text-center">
             <div className="spinner-border text-primary" role="status"></div>
@@ -246,21 +306,32 @@ function Home() {
           </div>
         )}
 
-        {currentUser && !isWaitingForEmailVerification && (
-          <div className="text-center">
-            <h1>Hello {firstName || "User"}! You are currently logged in</h1>
-            {showModal && !isProfileComplete && (
-              <ProfileModal onClose={handleModalClose} />
-            )}
-            {isProfileComplete && (
+        {/* 2) Profile incomplete: show ONLY the modal */}
+        {currentUser &&
+          !isWaitingForEmailVerification &&
+          showModal &&
+          !isProfileComplete && (
+            <ProfileModal
+              onSave={handleProfileSaved}
+              onCancel={handleProfileCanceled}
+            />
+          )}
+
+        {/* 3) Profile complete: greeting + logout */}
+        {currentUser &&
+          !isWaitingForEmailVerification &&
+          !showModal &&
+          isProfileComplete && (
+            <div className="text-center">
+              <h1>Hello {firstName}! You are currently logged in</h1>
               <button className="btn btn-danger mt-3" onClick={handleLogout}>
                 Logout
               </button>
-            )}
-          </div>
-        )}
+            </div>
+          )}
 
-        {!currentUser && !isWaitingForEmailVerification && (
+        {/* 4) No user: show login / sign-up form */}
+        {!currentUser && !isWaitingForEmailVerification && !showModal && (
           <>
             <h1 className="text-center mb-4">
               Please Login to access your account
@@ -327,8 +398,6 @@ function Home() {
                 {isLogin ? "Switch to Sign Up" : "Switch to Login"}
               </button>
             </div>
-
-            {/* Flashing Text Link */}
             <div className="text-center mt-3">
               <p className={`${isSignupSelected ? styles.flashingText : ""}`}>
                 Before you create an account, please review the{" "}
@@ -340,11 +409,7 @@ function Home() {
 
         {/* Bus Image at the bottom */}
         <div>
-          <img
-            src={bus}
-            alt="Bus"
-            className={styles.busAnimation}
-          />
+          <img src={bus} alt="Bus" className={styles.busAnimation} />
         </div>
       </div>
     </div>
