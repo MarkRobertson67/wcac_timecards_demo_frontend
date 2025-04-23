@@ -40,19 +40,7 @@ function Home() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      // clear anything you want fresh on next load:
-      localStorage.clear();
-      sessionStorage.clear();
-      // (do NOT call signOut here)
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
 
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, []);
   
 
   useEffect(() => {
