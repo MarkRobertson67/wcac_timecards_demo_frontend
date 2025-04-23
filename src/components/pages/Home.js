@@ -175,7 +175,7 @@ function Home() {
 
   const handleModalClose = () => {
     setShowModal(false);
-    navigate("/createNewTimeCard");
+    // navigate("/createNewTimeCard");
   };
 
   const handleResendVerification = async () => {
