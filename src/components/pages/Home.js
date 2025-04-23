@@ -40,23 +40,19 @@ function Home() {
 
   const navigate = useNavigate();
 
-    // On initial load, reset everything:
-    useEffect(() => {
-      // 1) clear any browser storage
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // clear anything you want fresh on next load:
       localStorage.clear();
       sessionStorage.clear();
-  
-      // 2) sign out of Firebase so there's no auto-login
-      signOut(auth).catch((err) => {
-        console.warn("Error signing out on load:", err);
-      });
-  
-      // 3) reset React state explicitly (optional, since full reload does this)
-      setShowModal(false);
-      setIsProfileComplete(false);
-      setFirstName("");
-      setCurrentUser(null);
-    }, []); 
+      // (do NOT call signOut here)
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
   
 
   useEffect(() => {
