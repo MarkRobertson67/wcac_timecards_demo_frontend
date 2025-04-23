@@ -40,6 +40,15 @@ function Home() {
 
   const navigate = useNavigate();
 
+    // On initial load, reset everything:
+    useEffect(() => {
+      setShowModal(false);
+      setIsProfileComplete(false);
+      setFirstName("");
+      setCurrentUser(null);
+    }, []);
+  
+
   useEffect(() => {
     let unsubscribe;
     let verificationInterval;
