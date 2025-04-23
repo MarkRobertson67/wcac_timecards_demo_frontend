@@ -42,11 +42,21 @@ function Home() {
 
     // On initial load, reset everything:
     useEffect(() => {
+      // 1) clear any browser storage
+      localStorage.clear();
+      sessionStorage.clear();
+  
+      // 2) sign out of Firebase so there's no auto-login
+      signOut(auth).catch((err) => {
+        console.warn("Error signing out on load:", err);
+      });
+  
+      // 3) reset React state explicitly (optional, since full reload does this)
       setShowModal(false);
       setIsProfileComplete(false);
       setFirstName("");
       setCurrentUser(null);
-    }, []);
+    }, []); 
   
 
   useEffect(() => {
