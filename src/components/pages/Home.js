@@ -214,14 +214,6 @@ function Home() {
     }
   };
 
-  // const handleModalClose = async () => {
-  //   setShowModal(false);
-  //   if (currentUser) {
-  //     await fetchProfile(currentUser.uid);
-  //   }
-  //   // navigate("/createNewTimeCard");
-  // };
-
   const handleResendVerification = async () => {
     if (currentUser) {
       try {
