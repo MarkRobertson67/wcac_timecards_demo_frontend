@@ -27,19 +27,19 @@ const ReportPage = () => {
   const [reportData, setReportData] = useState(initialReportData || []); //Use passed datathrough location.state
   const [loading, setLoading] = useState(false);
   const [cachedData, setCachedData] = useState({}); // Cache data for periods
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" && window.innerWidth < 376
-  );
+  // const [isMobile, setIsMobile] = useState(
+  //   typeof window !== "undefined" && window.innerWidth < 376
+  // );
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    window.addEventListener("resize", handleResize);
-    // run once on mount
-    handleResize();
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     setIsMobile(window.innerWidth < 768);
+  //   };
+  //   window.addEventListener("resize", handleResize);
+  //   // run once on mount
+  //   handleResize();
+  //   return () => window.removeEventListener("resize", handleResize);
+  // }, []);
 
   // Helper function to calculate the overall totals for detailed timecards
   const calculateTotalsForDetailedTimecards = () => {
@@ -502,6 +502,7 @@ const ReportPage = () => {
 
     return (
       <div id="reportPrint" className={`${styles.pageContainer} mt-4`}>
+        <div id="reportTop" />
         <div
           className={styles.reportTableContainer}
           // style={{ marginTop: "30px" }}
@@ -653,13 +654,23 @@ const ReportPage = () => {
         <div id="reportPrint" className={`${styles.pageContainer} mt-4`}>
           <div id="reportTop" />
 
-          <div className="title-page">
-            <h2 className="text-center mb-4">
+          {/* One scrollable wrapper for title + all employee tables */}
+        <div className={`${styles.reportTableContainer} reportTableContainer`}>
+          
+          {/* — PRINT ONLY: Title + subtitle */}
+          <div className="print-only titleContainer">
+            <h2 className="text-center mb-3">
               {titlePrefix} Employee Summary Report For ALL
             </h2>
+            <p className="text-center mb-3">
+              {`Report for: ${formatDate(startDate)} – ${formatDate(endDate)}`}
+            </p>
           </div>
+
+
           {/* Buttons Block */}
-          <div className="mb-4">
+          {/* — SCREEN ONLY: Period toggles + Print/Back */}
+          <div className="print-hide mb-4">
             {/* Period Toggle Buttons */}
             <div
               style={{
@@ -777,8 +788,7 @@ const ReportPage = () => {
             return (
               <div
                 key={employee.employee_id}
-                className={`page-break ${styles.reportTableContainer} mb-4`}
-              >
+                className={`page-break mb-4`}>
                 <h3 style={{ textAlign: "left" }}>
                   {employee.first_name} {employee.last_name}
                 </h3>
@@ -792,9 +802,7 @@ const ReportPage = () => {
                           ? "Month"
                           : "Year"}
                       </th>
-                      <th style={{ textAlign: "left" }}>
-                        Facility Total Hours
-                      </th>
+                      <th style={{ textAlign: "left" }}>Facility Total Hours</th>
                       <th style={{ textAlign: "left" }}>Driving Total Hours</th>
                       <th style={{ textAlign: "left" }}>Days Worked</th>
                       <th style={{ textAlign: "left" }}>Days Absent</th>
@@ -848,8 +856,11 @@ const ReportPage = () => {
                     </tr>
                   </tbody>
                 </table>
+                </div>
+                );
+              })}
                 <button
-                  className={`btn btn-sm btn-secondary mt-3 ${styles.backToTopButton}`}
+                  className={`btn btn-sm btn-secondary mt-3 print-hide ${styles.backToTopButton}`}
                   onClick={() => {
                     const el = document.getElementById("reportTop");
                     if (el)
@@ -860,8 +871,6 @@ const ReportPage = () => {
                   Back to Top
                 </button>
               </div>
-            );
-          })}
         </div>
       );
     } else {
@@ -915,14 +924,23 @@ const ReportPage = () => {
       overallTotalsForSingle.driving.minutes %= 60;
 
       return (
-        <div className={`${styles.pageContainer} mt-4`}>
-          <div id="reportTop" />
+        <div id="reportPrint" className={styles.pageContainer}>
+        <div id="reportTop" />
+
+        <div className={`${styles.reportTableContainer} reportTableContainer`}>
+          
+          {/* PRINT ONLY: single‐employee title */}
+          <div className="print-only titleContainer">
           <h2 className="text-center mb-4">
             {titlePrefix} Employee Summary Report For <br /> {firstName}{" "}
             {lastName}
           </h2>
+          <p className="text-center mb-3">
+            {`Report for: ${formatDate(startDate)} – ${formatDate(endDate)}`}
+          </p>
+          </div>
 
-          <div className="text-center mb-4">
+          <div className="text-center print-hide mb-4">
             {/* Period Toggle Buttons */}
             <div
               style={{
@@ -1013,28 +1031,21 @@ const ReportPage = () => {
             </div>
           </div>
 
-          <div className={styles.reportTableContainer}>
-            <table
-              className={`table table-striped table-bordered text-center ${styles.table}`}
-              style={{
-                tableLayout: "auto",
-                width: isMobile ? "100%" : "max-content",
-              }}
-            >
-              <thead>
-                <tr>
-                  <th style={{ minWidth: "160px" }}>
-                    {period === "weekly"
-                      ? "Period (Date Range)"
-                      : period === "monthly"
-                      ? "Month"
-                      : "Year"}
-                  </th>
-                  <th style={{ minWidth: "220px" }}>Facility Total Hours</th>
-                  <th style={{ minWidth: "140px" }}>Driving Total Hours</th>
-                  <th style={{ minWidth: "100px" }}>Days Worked</th>
-                  <th style={{ minWidth: "100px" }}>Days Absent</th>
-                </tr>
+          <table className="table table-striped table-bordered">
+          <thead>
+          <tr>
+                      <th style={{ textAlign: "left" }}>
+                        {period === "weekly"
+                          ? "Period (Date Range)"
+                          : period === "monthly"
+                          ? "Month"
+                          : "Year"}
+                      </th>
+                      <th style={{ textAlign: "left" }}>Facility Total Hours</th>
+                      <th style={{ textAlign: "left" }}>Driving Total Hours</th>
+                      <th style={{ textAlign: "left" }}>Days Worked</th>
+                      <th style={{ textAlign: "left" }}>Days Absent</th>
+                    </tr>
               </thead>
               <tbody>
                 {records.map((record, index) => {
@@ -1053,13 +1064,13 @@ const ReportPage = () => {
                   return (
                     <tr key={`${employeeId}-${index}`}>
                       <td
-                        style={{
-                          whiteSpace: "normal", // allow wrapping/newlines
-                          wordBreak: "break-word",
-                          fontSize: "0.75rem",
-                          maxWidth: isMobile ? "none" : "160px",
-                          minWidth: isMobile ? "0" : "160px",
-                        }}
+                        // style={{
+                        //   whiteSpace: "normal", // allow wrapping/newlines
+                        //   wordBreak: "break-word",
+                        //   fontSize: "0.75rem",
+                        //   maxWidth: isMobile ? "none" : "160px",
+                        //   minWidth: isMobile ? "0" : "160px",
+                        // }}
                       >
                         {parts.map((line, i) => (
                           <div key={i}>{line}</div>
@@ -1069,24 +1080,24 @@ const ReportPage = () => {
                       <td style={{ minWidth: "120px", whiteSpace: "pre-wrap" }}>
                         {record.facility_total_hours ? (
                           <>
-                            {record.facility_total_hours.hours} h<br />
+                            {record.facility_total_hours.hours} h{"  "}
                             {record.facility_total_hours.minutes} min
                           </>
                         ) : (
                           <>
-                            0 h<br />0 min
+                            0 h{"  "}0 min
                           </>
                         )}
                       </td>
                       <td style={{ minWidth: "140px" }}>
                         {record.driving_total_hours ? (
                           <>
-                            {record.driving_total_hours.hours} h<br />
+                            {record.driving_total_hours.hours} h{"  "}
                             {record.driving_total_hours.minutes} min
                           </>
                         ) : (
                           <>
-                            0 h<br />0 min
+                            0 h{"  "}0 min
                           </>
                         )}
                       </td>
@@ -1125,6 +1136,8 @@ const ReportPage = () => {
                 </tr>
               </tbody>
             </table>
+
+            {/* SCREEN ONLY: final “Back to Top” */}
             <button
           className={`btn btn-sm btn-secondary mt-3 ${styles.backToTopButton}`}
           onClick={() => {
@@ -1138,8 +1151,8 @@ const ReportPage = () => {
           </div>
         </div>
       );
-    }
   };
+}
 
   return (
     <div className={`${styles.reportpageContainer} mt-4`}>
