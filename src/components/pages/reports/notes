@@ -1,0 +1,21 @@
+  @media print {
+    /* hide every element on the page */
+    body * {
+      visibility: hidden !important;
+    }
+    /* make your table wrapper (and its children) visible */
+    .reportTableContainer,
+    .reportTableContainer * {
+      visibility: visible !important;
+    }
+    /* pin it to the top of the page and full width */
+    .reportTableContainer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      /* if you need breathing room: */
+      padding-top: 0.5in;
+      padding-bottom: 1in;
+      box-sizing: border-box;
+    }

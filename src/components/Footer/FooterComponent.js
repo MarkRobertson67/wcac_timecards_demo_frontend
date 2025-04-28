@@ -23,7 +23,7 @@ function FooterComponent() {
   };
 
   return (
-    <footer className="footer custom-footer bg-primary text-white text-center fixed-bottom">
+    <footer className="footer custom-footer bg-primary text-white text-center fixed-bottom print-hide">
       <div className="footer-top container p-2">
         <div className="row align-items-center justify-content-center">
           {/* Footer Columns */}
