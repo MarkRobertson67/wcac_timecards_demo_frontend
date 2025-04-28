@@ -502,7 +502,11 @@ const ReportPage = () => {
 
     return (
       <div id="reportPrint" className={`${styles.pageContainer} mt-4`}>
-        <div>
+        <div
+          className={styles.reportTableContainer}
+          // style={{ marginTop: "30px" }}
+        >
+                  <div>
         <div id="titleBlock" className={styles.titleContainer}>
           <h2 className="text-center">Total Hours Report</h2>
           <p className="text-center">
@@ -546,11 +550,6 @@ const ReportPage = () => {
             </button>
           </div>
         </div>
-
-        <div
-          className={styles.reportTableContainer}
-          // style={{ marginTop: "30px" }}
-        >
           <table className="table table-striped table-bordered text-center">
             <thead>
               <tr>
@@ -653,7 +652,7 @@ const ReportPage = () => {
       return (
         <div id="reportPrint" className={`${styles.pageContainer} mt-4`}>
           <div id="reportTop" />
-          {/* ===== Screen/print shared container ===== */}
+
           <div className="title-page">
             <h2 className="text-center mb-4">
               {titlePrefix} Employee Summary Report For ALL
