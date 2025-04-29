@@ -99,6 +99,11 @@ See LICENSE.txt file for details. */
     white-space: nowrap;
   }
 
+  .table td:first-child {
+    white-space: nowrap;
+    min-width: 150px;
+  }
+
   .button-group {
     flex-direction: row;
     justify-content: center;
@@ -114,7 +119,7 @@ See LICENSE.txt file for details. */
 
 
 /* ==== Extra small screen tweak ==== */
-@media (max-width: 375px) {
+@media (max-width: 360px) {
   .reportTableContainer {
     padding: 0 10px 100px 10px;
     overflow-x: auto !important;

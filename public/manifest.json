@@ -1,7 +1,7 @@
 {
   "short_name": "Timecard App",
   "name": "WCAC Timecard App",
-  "version": "1.0.7-DEMO",
+  "version": "1.0.8-DEMO",
   "icons": [
     {
       "src": "favicon.ico",

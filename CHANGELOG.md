@@ -2,6 +2,8 @@
 // Copyright (c) 2025 Mark Robertson
 // See LICENSE.txt file for details.
 
+## Version 1.0.8-DEMO (2025-04-22)
+- Fixed CSS for mobile and Fixed Print
 
 ## Version 1.0.7-DEMO (2025-04-22)
 - Updated Home and Modal for better Sign-up

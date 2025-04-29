@@ -806,15 +806,28 @@ const ReportPage = () => {
                                 )}
                           </td>
                           <td>
-                            {record.facility_total_hours
-                              ? `${record.facility_total_hours.hours} h ${record.facility_total_hours.minutes} min`
-                              : "0 hours 0 minutes"}
+                            {record.facility_total_hours ? (
+                              <>
+                                {record.facility_total_hours.hours} h{" "}
+                                <br className="mobile-break" />
+                                {record.facility_total_hours.minutes} min
+                              </>
+                            ) : (
+                              <>0 hours 0 minutes</>
+                            )}
                           </td>
                           <td>
-                            {record.driving_total_hours
-                              ? `${record.driving_total_hours.hours} h ${record.driving_total_hours.minutes} min`
-                              : "0 hours 0 minutes"}
+                            {record.driving_total_hours ? (
+                              <>
+                                {record.driving_total_hours.hours} h{" "}
+                                <br className="mobile-break" />
+                                {record.driving_total_hours.minutes} min
+                              </>
+                            ) : (
+                              <>0 hours 0 minutes</>
+                            )}
                           </td>
+
                           <td>{record.days_worked}</td>
                           <td>{record.absentee_days}</td>
                         </tr>
@@ -827,12 +840,14 @@ const ReportPage = () => {
                         <td>
                           <strong>
                             {employeeTotals.facility.hours} h{"  "}
+                            <br className="mobile-break" />
                             {employeeTotals.facility.minutes} min
                           </strong>
                         </td>
                         <td>
                           <strong>
                             {employeeTotals.driving.hours} h{"  "}
+                            <br className="mobile-break" />
                             {employeeTotals.driving.minutes} min
                           </strong>
                         </td>
@@ -1112,12 +1127,8 @@ const ReportPage = () => {
                         )}
                       </td>
 
-                      <td>
-                        {record.days_worked}
-                      </td>
-                      <td>
-                        {record.absentee_days}
-                      </td>
+                      <td>{record.days_worked}</td>
+                      <td>{record.absentee_days}</td>
                     </tr>
                   );
                 })}
