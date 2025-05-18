@@ -13,6 +13,28 @@ import mySound from "../../../Assets/mySound.wav";
 
 const API = process.env.REACT_APP_API_URL;
 
+const defaultActivity = "Facility";
+
+function inferMorningActivity(entry) {
+  // if there’s _any_ facility AM time, call it Facility;
+  // else if there’s _any_ driving AM time, call it Driving;
+  // otherwise default to Facility.
+  return entry.facilityStartTime  || entry.facilityLunchStart
+    ? "Facility"
+    : entry.drivingStartTime || entry.drivingLunchStart
+      ? "Driving"
+      : defaultActivity;
+}
+
+function inferAfternoonActivity(entry) {
+  // similar logic for PM slots
+  return entry.facilityLunchEnd || entry.facilityEndTime
+    ? "Facility"
+    : entry.drivingLunchEnd || entry.drivingEndTime
+      ? "Driving"
+      : defaultActivity;
+}
+
 function ActiveTimeCard({ setIsNewTimeCardCreated }) {
   const [timeCard, setTimeCard] = useState({ entries: [], isSubmitted: false });
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +54,9 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
 
   // Check if the screen width is mobile (adjust as needed for your breakpoint)
   //const isMobile = width <= 768;
+  
 
+  
   useEffect(() => {
     const fetchEmployeeId = async () => {
       try {
@@ -145,8 +169,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           fetchedEntriesMap.set(date, {
             id: entry.id,
             date,
-            morningActivity: entry.morning_activity || defaultActivity,
-            afternoonActivity: entry.afternoon_activity || defaultActivity,
+            // morningActivity: entry.morning_activity || defaultActivity,
+            // afternoonActivity: entry.afternoon_activity || defaultActivity,
             facilityStartTime: formatTime(entry.facility_start_time) || "",
             facilityLunchStart: formatTime(entry.facility_lunch_start) || "",
             facilityLunchEnd: formatTime(entry.facility_lunch_end) || "",
@@ -218,8 +242,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
             driving_total_hours: "0h 0m",
             status: "active",
             employee_id: employeeId,
-            morning_activity: defaultActivity,
-            afternoon_activity: defaultActivity,
+            // morning_activity: defaultActivity,
+            // afternoon_activity: defaultActivity,
           };
 
           console.log(`Creating new entry for date: ${date}`);
@@ -296,7 +320,17 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
           ...successfulCreatedEntries,
         ];
         // Update timeCard state
-        setTimeCard({ entries: allEntries, isSubmitted: false });
+        // setTimeCard({ entries: allEntries, isSubmitted: false });
+
+        // now inject the two client-only dropdown fields:
+        const initializedEntries = allEntries.map((e) => ({
+          ...e,
+          morningActivity: inferMorningActivity(e),
+          afternoonActivity: inferAfternoonActivity(e),
+        }));
+        // Update timeCard state
+        setTimeCard({ entries: initializedEntries, isSubmitted: false });
+
       } catch (error) {
         console.error("Error fetching timecard data:", error);
         setTimeCard({ entries: [], isSubmitted: false });
@@ -306,6 +340,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     },
     [employeeId, defaultActivity]
   );
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -564,7 +599,7 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
         alert(
           `You cannot modify the entry for ${moment(entry.date).format(
             "MMMM Do, YYYY"
-          )} because it has already been submitted.`
+          )} because it has already been submitted. Please refer to the TimeCard Index to see the entered times.`
         );
         return prevState; // Return unchanged state if the entry is submitted
       }
@@ -677,8 +712,8 @@ function ActiveTimeCard({ setIsNewTimeCardCreated }) {
     const requestPayload = {
       employee_id: employeeId,
       work_date: entryToUpdate.date,
-      morning_activity: entryToUpdate.morningActivity || defaultActivity,
-      afternoon_activity: entryToUpdate.afternoonActivity || defaultActivity,
+      // morning_activity: entryToUpdate.morningActivity || defaultActivity,
+      // afternoon_activity: entryToUpdate.afternoonActivity || defaultActivity,
       facility_start_time: entryToUpdate.facilityStartTime || null,
       facility_lunch_start: entryToUpdate.facilityLunchStart || null,
       facility_lunch_end: entryToUpdate.facilityLunchEnd || null,

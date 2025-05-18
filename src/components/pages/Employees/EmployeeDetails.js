@@ -17,13 +17,17 @@ import { auth } from "../../../firebase/firebaseConfig";
 import styles from "./EmployeeDetails.module.css";
 
 const API = process.env.REACT_APP_API_URL;
+const protectedIds = [1, 2];  // primary admin (1) + demo user (2)
 
 function EmployeeDetails() {
   const { id } = useParams(); // Get employee ID from URL
   const navigate = useNavigate();
   const [employee, setEmployee] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); 
+  const isProtected = employee && protectedIds.includes(employee.id);
+
+
 
   // Fetch employee details based on ID
   const fetchEmployee = useCallback(async () => {
@@ -62,22 +66,35 @@ function EmployeeDetails() {
     fetchEmployee();
   }, [fetchEmployee]);
 
-  const handleChange = (e) => {
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+
+  //   // Prevent changing is_admin to false for the protected admin account
+  //   if (name === "is_admin" && employee.id === 1 && value === "false") {
+  //     alert("Admin privileges cannot be removed for this account.");
+  //     return;
+  //   }
+
+  const handleChange = e => {
+    if (isProtected) return; // no edits allowed
     const { name, value } = e.target;
-
-    // Prevent changing is_admin to false for the protected admin account
-    if (name === "is_admin" && employee.id === 1 && value === "false") {
-      alert("Admin privileges cannot be removed for this account.");
-      return;
-    }
-
-    setEmployee((prevEmployee) => ({
-      ...prevEmployee,
+    setEmployee(emp => ({
+      ...emp,
       [name]: name === "is_admin" ? value === "true" : value,
     }));
   };
 
+  //   setEmployee((prevEmployee) => ({
+  //     ...prevEmployee,
+  //     [name]: name === "is_admin" ? value === "true" : value,
+  //   }));
+  // };
+
   const handleSave = async () => {
+    if (isProtected) {
+      alert("You cannot modify this protected account.");
+      return;
+    }
     try {
       // Prevent saving changes for the primary admin account (ID = 1)
       if (employee.id === 1 && employee.is_admin === false) {
@@ -122,6 +139,10 @@ function EmployeeDetails() {
   };
 
   const handleDelete = async () => {
+    if (isProtected) {
+      alert("You cannot delete this protected account.");
+      return;
+    }
     if (employee.id === 1) {
       alert("The primary admin account cannot be deleted.");
       return;

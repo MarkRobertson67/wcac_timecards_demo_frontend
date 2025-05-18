@@ -21,9 +21,16 @@ import bus from "../../Assets/Bus.png";
 
 const API = process.env.REACT_APP_API_URL;
 
+// ======= DEMO CREDENTIALS =======
+const DEMO_EMAIL = "demo.mode.timecards@gmail.com";
+const DEMO_PASSWORD = "Demo1234";
+
+let demoAlertHasRun = false;
+
+
 function Home() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(DEMO_EMAIL);
+  const [password, setPassword] = useState(DEMO_PASSWORD);
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -39,6 +46,21 @@ function Home() {
   const [isSignupSelected, setIsSignupSelected] = useState(false);
 
   const navigate = useNavigate();
+
+
+
+  useEffect(() => {
+    if (!demoAlertHasRun) {
+      alert(
+        "🚧 This app is running in DEMO MODE. " +
+        "We've pre-filled a demo account for you—just click “Login” to continue and explore all features. " +
+        "We've also seeded dummy timecard entries from May 19 through September 30, 2025, so you can browse the pre-filled facility/driving hours, run reports, or add new entries to test functionality. " +
+        "If you’d rather create your own account, click “Switch to Sign Up.” 🚧"
+      );
+      demoAlertHasRun = true;
+    }
+  }, []);
+
 
   // helper to fetch profile and update state
   const fetchProfile = useCallback(
